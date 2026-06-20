@@ -16,7 +16,6 @@ const swaggerDocument = YAML.load('./docs/swagger.yaml');
 var app = express(); 
  
 //middlewares 
-const cors = require('cors');
 app.use(cors());
  
 // Interfaz de Swagger expuesta en la raíz /api-docs
