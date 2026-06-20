@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: API Sistema de Transporte - Remisería
+  version: 1.0.0
+  description: Documentación de la API basada en el diagrama UML de Usuarias (Pasajeras, Operadoras, Conductoras), Solicitudes y Viajes.
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor de Desarrollo Local
+
+paths:
+  # === SOLICITUDES ===
+  /solicitud:
+    post:
+      summary: Registrar una nueva solicitud de viaje (Acción de Pasajera)
+      tags: [Solicitudes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SolicitudInput'
+      responses:
+        201:
+          description: Solicitud registrada con éxito.
+        404:
+          description: La usuaria no existe o no es una pasajera.
+        400:
+          description: Error en los datos enviados.
+
+  /solicitud/pendientes:
+    get:
+      summary: Obtener todas las solicitudes en estado pendiente (CU-02 Pasos 1 y 2)
+      tags: [Solicitudes]
+      responses:
+        200:
+          description: Lista de solicitudes pendientes recuperada correctamente.
+        400:
+          description: Error al obtener las solicitudes.
+
+  # === CONDUCTORAS ===
+  /conductora/disponibles:
+    get:
+      summary: Obtener el listado de conductoras activas y disponibles (CU-02 Pasos 3 a 5)
+      tags: [Conductoras]
+      responses:
+        200:
+          description: Respuesta exitosa con la lista de conductoras o aviso de que no hay disponibles (Flujo alternativo 4).
+        400:
+          description: Error al procesar la búsqueda.
+
+  # === VIAJES ===
+  /viaje/asignar:
+    post:
+      summary: Confirmar la asignación de una solicitud a un viaje real (CU-02 Pasos 6 a 13)
+      tags: [Viajes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AsignacionViajeInput'
+      responses:
+        201:
+          description: Viaje formalizado, solicitud actualizada a "Asignado" y notificaciones simuladas con éxito.
+        400:
+          description: La solicitud no está pendiente, la conductora no está disponible o error interno.
+
+components:
+  schemas:
+    SolicitudInput:
+      type: object
+      required:
+        - pasajeraId
+        - origen
+        - inicio
+      properties:
+        pasajeraId:
+          type: integer
+          example: 2
+          description: ID de la usuaria con rol 'pasajera'
+        origen:
+          type: string
+          example: "Av. Belgrano 1240"
+        inicio:
+          type: string
+          example: "Terminal de Ómnibus"
+          description: Destino o punto inicial del trayecto solicitado
+
+    AsignacionViajeInput:
+      type: object
+      required:
+        - solicitudId
+        - operadoraId
+        - conductoraId
+        - fecha
+        - horaInicio
+      properties:
+        solicitudId:
+          type: integer
+          example: 1
+        operadoraId:
+          type: integer
+          example: 3
+          description: ID de la usuaria con rol 'operadora'
+        conductoraId:
+          type: integer
+          example: 5
+          description: ID de la usuaria con rol 'conductora'
+        fecha:
+          type: string
+          format: date
+          example: "2026-06-20"
+        horaInicio:
+          type: string
+          format: date-time
+          example: "2026-06-20T08:30:00Z"

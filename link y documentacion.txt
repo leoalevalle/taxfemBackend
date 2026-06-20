@@ -1,0 +1,7 @@
+link al github:
+https://github.com/leoalevalle/tp5-ValleAlejandro-4139-backend
+
+link a la documentacion swagger:
+http://localhost:3000/api-docs/
+
+cambiar la contraseña en config/database.js
