@@ -1,14 +1,26 @@
-const { Sequelize } = require('sequelize'); 
- 
-// Crea proyectodb en el servidory configura las credenciales de tu bd de PostgreSQL 
-const sequelize = new Sequelize('tfdb', 'postgres', 'leonel2014', { 
-  host: 'localhost', 
-  dialect: 'postgres', 
-  logging: false, // Evita que llene la consola con logs de consultas SQL básicas 
-}); 
-// Probar y levantar la conexión 
-sequelize.authenticate() 
-  .then(() => console.log('DB is connected to PostgreSQL')) 
-  .catch(err => console.error('Error al conectar a PostgreSQL:', err)); 
- 
+const { Sequelize } = require('sequelize');
+
+let sequelize;
+
+// Si existe la variable en Render, se conecta mediante la URL completa
+if (process.env.DATABASE_URL) {
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    logging: false, // Evita llenar la consola de Render con logs SQL
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false // Requerido obligatoriamente por Render para conexiones seguras
+      }
+    }
+  });
+} else {
+  // Configuración local que ya tenías para tu computadora
+  sequelize = new Sequelize('tfbd', 'postgres', 'leonel2014', {
+    host: 'localhost',
+    dialect: 'postgres',
+    logging: console.log
+  });
+}
+
 module.exports = sequelize;
