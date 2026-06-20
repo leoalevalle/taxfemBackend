@@ -17,6 +17,7 @@ var app = express();
  
 //middlewares 
 app.use(cors());
+app.use(express.json());
  
 // Interfaz de Swagger expuesta en la raíz /api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
