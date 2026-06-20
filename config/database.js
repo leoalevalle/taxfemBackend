@@ -16,7 +16,7 @@ if (process.env.DATABASE_URL) {
   });
 } else {
   // Configuración local que ya tenías para tu computadora
-  sequelize = new Sequelize('tfbd', 'postgres', 'leonel2014', {
+  sequelize = new Sequelize('tfbd', 'postgres', 'contraseña', {
     host: 'localhost',
     dialect: 'postgres',
     logging: console.log
