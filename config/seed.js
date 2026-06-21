@@ -38,7 +38,7 @@ const cargarDatosDePrueba = async () => {
                 contraseña: 'password123',
                 rol: 'pasajera'
             },
-            // --- CONDUCTORAS (idUsuario: 4 y 5) ---
+            // --- CONDUCTORAS (idUsuario: 4, 5, 6, 7) ---
             {
                 nombre: 'Elena Gómez',
                 telefono: '3884112233',
@@ -58,6 +58,26 @@ const cargarDatosDePrueba = async () => {
                 rol: 'conductora',
                 disponible: true,
                 matricula: 61129
+            },
+            {
+                nombre: 'Tatiana Gonzales',
+                telefono: '3884112233',
+                email: 'tatigonzales.conductora@outlook.com',
+                usuario: 'tati_viajes',
+                contraseña: 'password123',
+                rol: 'conductora',
+                disponible: true,
+                matricula: 45511
+            },
+            {
+                nombre: 'Patricia Cruz',
+                telefono: '3885889900',
+                email: 'paty.conductora@gmail.com',
+                usuario: 'paty_viajes',
+                contraseña: 'password123',
+                rol: 'conductora',
+                disponible: true,
+                matricula: 61100
             }
         ]);
 
