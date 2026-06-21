@@ -36,7 +36,7 @@ viajeCtrl.asignarViaje = async (req, res) => {
             conductoraId,
             fecha,
             horaInicio,
-            estadoDeViaje: 'pendiente'
+            estadoDeViaje: 'asignado'
         });
 
         // 10. Actualiza estado de solicitud a “Asignado” y ocupa a la conductora.
