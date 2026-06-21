@@ -65,6 +65,93 @@ paths:
         400:
           description: La solicitud no está pendiente, la conductora no está disponible o error interno.
 
+  /viaje/aceptar/{idViaje}:
+    put:
+      summary: Aceptar un viaje asignado (Conductora)
+      description: Cambia el estado del viaje a 'encurso' cuando la conductora acepta la solicitud.
+      parameters:
+        - name: idViaje
+          in: path
+          required: true
+          description: ID numérico del viaje a aceptar
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Viaje aceptado con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "1"
+                  msg:
+                    type: string
+                    example: "Viaje aceptado con éxito. ¡Buen viaje, conductora!"
+                  data:
+                    type: object
+                    properties:
+                      idViaje:
+                        type: integer
+                        example: 12
+                      estadoDeViaje:
+                        type: string
+                        example: "encurso"
+        '400':
+          description: Error en la solicitud o el viaje ya fue respondido.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "0"
+                  msg:
+                    type: string
+                    example: "El viaje no existe o ya fue respondido."
+
+  /viaje/rechazar/{idViaje}:
+    put:
+      summary: Rechazar un viaje asignado (Conductora)
+      description: Cancela el viaje actual, libera a la conductora y vuelve a poner la solicitud original en estado 'pendiente' para la operadora.
+      parameters:
+        - name: idViaje
+          in: path
+          required: true
+          description: ID numérico del viaje a rechazar
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Viaje rechazado y solicitud reabierta con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "1"
+                  msg:
+                    type: string
+                    example: "Viaje rechazado. La solicitud vuelve a estar disponible para asignación."
+        '400':
+          description: Error al procesar el rechazo.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "0"
+                  msg:
+                    type: string
+                    example: "El viaje no existe o ya fue respondido."
+
 components:
   schemas:
     SolicitudInput:
