@@ -39,20 +39,37 @@ solicitudCtrl.createSolicitud = async (req, res) => {
 };
 
 // Obtener solicitudes pendientes (Flujo principal: Paso 1 y 2)
+// Obtener solicitudes activas de las pasajeras (Pendientes y Asignadas)
 solicitudCtrl.getPendientes = async (req, res) => {
     try {
         const solicitudes = await SolicitudViaje.findAll({
-            where: { estado: 'pendiente' }, // true significa "pendiente" en nuestro diseño inicial
-            include: [{
-                model: Usuaria,
-                as: 'pasajera',
-                attributes: ['idUsuario', 'nombre', 'telefono']
-            }]
+            // 1. Buscamos tanto las que esperan operadora como las ya asignadas
+            where: { 
+                estado: ['pendiente', 'asignado'] 
+            }, 
+            include: [
+                {
+                    model: Usuaria,
+                    as: 'pasajera',
+                    attributes: ['idUsuario', 'nombre', 'telefono']
+                },
+                // 2. Traemos el viaje generado junto con la conductora y su vehículo
+                {
+                    model: Viaje,
+                    as: 'viaje', // Asegúrate de que coincida con el alias de tu asociación
+                    required: false, // Permite que aparezca la solicitud aunque no tenga viaje aún
+                    include: [{
+                        model: Usuaria,
+                        as: 'conductora', // Alias de la conductora en tu modelo de Viaje
+                        attributes: ['nombre', 'matricula']
+                    }]
+                }
+            ]
         });
         res.status(200).json(solicitudes);
     } catch (error) {
         res.status(400).json({ status: '0', msg: 'Error al obtener solicitudes', error: error.message });
     }
-};
+};;
 
 module.exports = solicitudCtrl;
