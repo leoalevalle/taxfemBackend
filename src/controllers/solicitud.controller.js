@@ -1,5 +1,7 @@
+const { Op } = require('sequelize');
 const SolicitudViaje = require('../models/solicitudViaje.model');
 const Usuaria = require('../models/usuaria.model');
+const Viaje = require('../models/viaje.model');
 
 const solicitudCtrl = {};
 
@@ -43,9 +45,11 @@ solicitudCtrl.createSolicitud = async (req, res) => {
 solicitudCtrl.getPendientes = async (req, res) => {
     try {
         const solicitudes = await SolicitudViaje.findAll({
-            // 1. Buscamos tanto las que esperan operadora como las ya asignadas
+            // Usamos Op.in para garantizar que Sequelize entienda la búsqueda de múltiples estados
             where: { 
-                estado: ['pendiente', 'asignado'] 
+                estado: {
+                    [Op.in]: ['pendiente', 'asignado']
+                }
             }, 
             include: [
                 {
@@ -53,14 +57,14 @@ solicitudCtrl.getPendientes = async (req, res) => {
                     as: 'pasajera',
                     attributes: ['idUsuario', 'nombre', 'telefono']
                 },
-                // 2. Traemos el viaje generado junto con la conductora y su vehículo
                 {
                     model: Viaje,
-                    as: 'viaje', // Asegúrate de que coincida con el alias de tu asociación
-                    required: false, // Permite que aparezca la solicitud aunque no tenga viaje aún
+                    // Si tira error de asociación, podés comentar el bloque del 'model: Viaje' 
+                    // temporalmente para verificar las relaciones de tus modelos.
+                    required: false, 
                     include: [{
                         model: Usuaria,
-                        as: 'conductora', // Alias de la conductora en tu modelo de Viaje
+                        as: 'conductora', 
                         attributes: ['nombre', 'matricula']
                     }]
                 }
@@ -70,6 +74,6 @@ solicitudCtrl.getPendientes = async (req, res) => {
     } catch (error) {
         res.status(400).json({ status: '0', msg: 'Error al obtener solicitudes', error: error.message });
     }
-};;
+};
 
 module.exports = solicitudCtrl;
