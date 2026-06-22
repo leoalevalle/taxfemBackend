@@ -45,10 +45,9 @@ solicitudCtrl.createSolicitud = async (req, res) => {
 solicitudCtrl.getPendientes = async (req, res) => {
     try {
         const solicitudes = await SolicitudViaje.findAll({
-            // Usamos Op.in para garantizar que Sequelize entienda la búsqueda de múltiples estados
             where: { 
                 estado: {
-                    [Op.in]: ['pendiente', 'asignado']
+                    [Op.in]: ['pendiente']
                 }
             }, 
             include: [
@@ -59,8 +58,10 @@ solicitudCtrl.getPendientes = async (req, res) => {
                 },
                 {
                     model: Viaje,
-                    // Si tira error de asociación, podés comentar el bloque del 'model: Viaje' 
-                    // temporalmente para verificar las relaciones de tus modelos.
+                    // 💡 SI TE SEGUÍA DANDO ERROR POR EL ALIAS:
+                    // Cambiá el 'as: 'viaje'' de acá abajo por el alias real de tu relación (ej: 'viajes' o 'datosViaje')
+                    // O si hiciste la relación simple sin alias, borrá la línea 'as: ...' por completo.
+                    as: 'viaje', 
                     required: false, 
                     include: [{
                         model: Usuaria,

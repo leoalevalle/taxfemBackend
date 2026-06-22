@@ -6,5 +6,8 @@ const viajeCtrl = require('../controllers/viaje.controller');
 router.post('/asignar', viajeCtrl.asignarViaje);
 router.put('/aceptar/:idViaje', viajeCtrl.aceptarViaje);
 router.put('/rechazar/:idViaje', viajeCtrl.rechazarViaje);
+router.get('/', viajeCtrl.getViajesActivos);
+router.put('/finalizar/:idViaje', viajeCtrl.finalizarViaje);
+router.put('/cancelar/:idViaje', viajeCtrl.cancelarViajeConductora);
 
 module.exports = router;

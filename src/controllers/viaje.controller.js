@@ -4,6 +4,30 @@ const Usuaria = require('../models/usuaria.model');
 
 const viajeCtrl = {};
 
+// NUEVO / REVISADO: Obtener lista de viajes incluyendo pasajera y conductora
+viajeCtrl.getViajesActivos = async (req, res) => {
+    try {
+        const viajes = await Viaje.findAll({
+            include: [
+                {
+                    model: SolicitudViaje,
+                    as: 'solicitud',
+                    include: [{ model: Usuaria, as: 'pasajera', attributes: ['nombre', 'telefono'] }]
+                },
+                // 🌟 AQUÍ ESTÁ LA MAGIA: Incluimos a la conductora con su nombre y matrícula
+                {
+                    model: Usuaria,
+                    as: 'conductora', // Asegúrate de que coincida con el alias en las asociaciones de tu modelo Viaje
+                    attributes: ['nombre', 'matricula', 'telefono']
+                }
+            ]
+        });
+        res.status(200).json(viajes);
+    } catch (error) {
+        res.status(400).json({ status: '0', msg: 'Error al obtener los viajes con sus datos', error: error.message });
+    }
+};
+
 viajeCtrl.asignarViaje = async (req, res) => {
     try {
         const { solicitudId, operadoraId, conductoraId, fecha, horaInicio } = req.body;
@@ -130,6 +154,44 @@ viajeCtrl.rechazarViaje = async (req, res) => {
 
     } catch (error) {
         res.status(400).json({ status: '0', msg: 'Error al rechazar el viaje.', error: error.message });
+    }
+};
+
+viajeCtrl.finalizarViaje = async (req, res) => {
+    try {
+        const { idViaje } = req.params;
+        const viaje = await Viaje.findByPk(idViaje);
+        if (!viaje) return res.status(400).json({ status: '0', msg: 'El viaje no existe.' });
+
+        // Marcamos el viaje como finalizado y registramos la hora de fin
+        await viaje.update({ estadoDeViaje: 'finalizado', horaFin: new Date().toISOString() });
+
+        // Liberamos a la conductora para que vuelva a estar disponible
+        const conductora = await Usuaria.findByPk(viaje.conductoraId);
+        if (conductora) await conductora.update({ disponible: true });
+
+        res.status(200).json({ status: '1', msg: 'Viaje finalizado con éxito. Conductora liberada.' });
+    } catch (error) {
+        res.status(400).json({ status: '0', msg: 'Error al finalizar el viaje.', error: error.message });
+    }
+};
+
+viajeCtrl.cancelarViajeConductora = async (req, res) => {
+    try {
+        const { idViaje } = req.params;
+        const viaje = await Viaje.findByPk(idViaje);
+        if (!viaje) return res.status(400).json({ status: '0', msg: 'El viaje no existe.' });
+
+        // El viaje se cancela
+        await viaje.update({ estadoDeViaje: 'cancelado', horaFin: new Date().toISOString() });
+
+        // Liberamos a la conductora
+        const conductora = await Usuaria.findByPk(viaje.conductoraId);
+        if (conductora) await conductora.update({ disponible: true });
+
+        res.status(200).json({ status: '1', msg: 'Viaje cancelado con éxito. Conductora liberada.' });
+    } catch (error) {
+        res.status(400).json({ status: '0', msg: 'Error al cancelar el viaje.', error: error.message });
     }
 };
 
