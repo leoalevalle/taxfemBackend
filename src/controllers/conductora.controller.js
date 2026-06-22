@@ -35,7 +35,7 @@ conductoraCtrl.getMisViajes = async (req, res) => {
     try {
         const { id } = req.params;
         const viajes = await Viaje.findAll({
-            where: { conductoraId: id, estadoDeViaje: 'asignado' },
+            where: { conductoraId: id, estadoDeViaje: ['pendiente', 'asignado', 'encurso'] },
             include: [{
                 model: SolicitudViaje,
                 as: 'solicitud',
